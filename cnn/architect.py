@@ -38,8 +38,12 @@ class Architect(object):
             self._backward_step(input_valid, target_valid)
         self.optimizer.step()
 
+    def _model_loss(self, input, target):
+        logits = self.model(input)
+        return self.model.module._criterion(logits, target)
+
     def _backward_step(self, input_valid, target_valid):
-        loss = self.model.module._loss(input_valid, target_valid)
+        loss = self._model_loss(input_valid, target_valid)
         loss.backward()
 
     def _backward_step_unrolled(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer):

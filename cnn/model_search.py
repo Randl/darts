@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -120,12 +122,17 @@ class Network(nn.Module):
         k = sum(1 for i in range(self._steps) for n in range(2 + i))
         num_ops = len(PRIMITIVES)
 
-        self.alphas_normal = Variable(1e-3 * torch.randn(k, num_ops).cuda(), requires_grad=True)
-        self.alphas_reduce = Variable(1e-3 * torch.randn(k, num_ops).cuda(), requires_grad=True)
+        self.alphas_normal = nn.Parameter(1e-3 * torch.randn(k, num_ops))
+        self.alphas_reduce = nn.Parameter(1e-3 * torch.randn(k, num_ops))
         self._arch_parameters = [
             self.alphas_normal,
             self.alphas_reduce,
         ]
+
+    def reg_parameters(self):
+        tmp_params = OrderedDict(self.named_parameters())
+        params = [tmp_params[p] for p in tmp_params if p != 'alphas_normal' and p != 'alphas_reduce']
+        return params
 
     def arch_parameters(self):
         return self._arch_parameters

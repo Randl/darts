@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import time
+from collections import OrderedDict
 
 import numpy as np
 import torch
@@ -99,7 +100,7 @@ def main():
 
     setup_logging(args.save)
     logging.info('random seed = %d' % args.seed)
-    logging.info('gpu device = {}'.format(args.gpus))
+    logging.info('gpu devices = {}'.format(args.gpus))
     logging.info("args = %s", args)
 
     criterion = nn.CrossEntropyLoss()
@@ -111,7 +112,7 @@ def main():
     criterion.to(device=args.device, dtype=args.dtype)
     logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
-    optimizer = torch.optim.SGD(model.parameters(), args.learning_rate, momentum=args.momentum,
+    optimizer = torch.optim.SGD(model.module.reg_parameters(), args.learning_rate, momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 
     train_transform, valid_transform = utils._data_transforms_cifar10(args)
