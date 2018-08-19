@@ -14,7 +14,8 @@ class Architect(object):
     self.network_momentum = args.momentum
     self.network_weight_decay = args.weight_decay
     self.model = model
-    self.optimizer = torch.optim.Adam(self.model.arch_parameters(),
+    params = self.model.module.arch_parameters()
+    self.optimizer = torch.optim.Adam(params,
         lr=args.arch_learning_rate, betas=(0.5, 0.999), weight_decay=args.arch_weight_decay)
 
   def _compute_unrolled_model(self, input, target, eta, network_optimizer):
@@ -37,7 +38,7 @@ class Architect(object):
     self.optimizer.step()
 
   def _backward_step(self, input_valid, target_valid):
-    loss = self.model._loss(input_valid, target_valid)
+    loss = self.model.module._loss(input_valid, target_valid)
     loss.backward()
 
   def _backward_step_unrolled(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer):

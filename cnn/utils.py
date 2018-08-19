@@ -1,9 +1,20 @@
+import logging
 import os
 import numpy as np
 import torch
 import shutil
 import torchvision.transforms as transforms
 from torch.autograd import Variable
+from tqdm import tqdm
+
+
+class TqdmHandler(logging.StreamHandler):
+    def __init__(self):
+        logging.StreamHandler.__init__(self)
+
+    def emit(self, record):
+        msg = self.format(record)
+        tqdm.write(msg)
 
 
 class AvgrageMeter(object):
@@ -110,11 +121,11 @@ def drop_path(x, drop_prob):
 
 def create_exp_dir(path, scripts_to_save=None):
   if not os.path.exists(path):
-    os.mkdir(path)
+    os.makedirs(path)
   print('Experiment dir : {}'.format(path))
 
   if scripts_to_save is not None:
-    os.mkdir(os.path.join(path, 'scripts'))
+    os.makedirs(os.path.join(path, 'scripts'))
     for script in scripts_to_save:
       dst_file = os.path.join(path, 'scripts', os.path.basename(script))
       shutil.copyfile(script, dst_file)
